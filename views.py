@@ -13,6 +13,7 @@ from django.template import Template, TemplateSyntaxError
 import simplejson as json
 from huTools.couch import setup_couchdb
 from huTools.decorators import ajax_request
+from uuid import uuid4
 
 def couch():
     """Helper function"""
@@ -27,7 +28,7 @@ def list_templates(request):
         doc = db[row.key]
         templates.append((doc.id, doc['name']))
     
-    return render_to_response("temple/list_templates.html",
+    return render_to_response("temple/temple.html",
                               {'templates': templates})
 
 
@@ -44,6 +45,7 @@ def get_template(request):
 def set_template(request):
 
     doc_id = request.POST.get('id')
+    name = request.POST.get('name')
     source = request.POST.get('source')
 
     try:
@@ -52,7 +54,15 @@ def set_template(request):
         return {'status': 'error', 'msg': exception.message}
     
     db = couch()
-    doc = db[doc_id]
+    
+    if doc_id == "-1":
+        doc_id = uuid4().hex
+        doc = {'_id': doc_id}
+        print "new doc:", doc
+    else:
+        doc = db[doc_id]
+    
+    doc['name'] = name
     doc['source'] = source
     db[doc_id] = doc
     return {'status': 'ok', 'msg': "Changed"}

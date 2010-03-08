@@ -1,0 +1,90 @@
+<html>
+<head>
+    <script src="http://localhost:5984/_utils/script/jquery.js?1.3.1" type="text/javascript"></script>
+    <script type="text/javascript">
+        <!--
+            var modified = false;
+            var text = "";
+            
+            $("document").ready(function() {
+                
+                $("#name_input").hide();
+                $("#name_span").show();
+                
+                $("#template_select").change(function() {
+                    var selected = $("#template_select").val();
+                    
+                    if(selected == "-1") {
+                        $("#source").val('');
+                        return;
+                    }
+                    
+                    var params = {"id": selected};
+                    $.post("../get/", params, function(data) {
+                        text = data.source;
+                        $("#source").val(data);
+                    });
+                });
+                
+                $("#name_span").click(function() {
+                    $("#name_span").hide();
+                    $("#name_input").show().focus();
+                });
+                
+                $("#name_input").blur(function() {
+                    var input = $("#name_input");
+                    var span = $("#name_span");
+                    
+                    span.text(input.val());
+                    input.hide();
+                    span.show();
+                });
+                
+                $("#source").keyup(function() {
+                    modified = true;
+                });
+                
+                $("#edit_form").submit(function() {
+                    if(modified) {
+                        //if($("#source").val() != text) {
+                        
+                        var params = {"id": $("#template_select").val(),
+                                      "name": $("#name_input").val(),
+                                      "source": $("#source").val()};
+                        $.post("../set/", params, function(data) {
+                            if(data.status != 'ok') {
+                                $("#error_message").text(data.msg);
+                            } else {
+                                $("#error_message").text('');
+                            }
+                        }, "json");
+                    }
+                    return false;
+                });
+            });
+        // -->
+    </script>
+</head>
+<body>
+<form id="edit_form" action="." method="POST">
+<div>
+    <select name="template" id="template_select">
+    <option value="-1">New Template...</option>
+{% for id, name in templates %}
+    {% ifequal id page_id %}
+        <option value="{{ id }}" selected>{{ name }}</option>
+    {% else %}
+         <option value="{{id}}">{{ name }}</option>
+    {% endifequal %}
+{% endfor %}
+    </select>
+</div>
+<div>Name: <input id="name_input" value="{{ name }}"/><span id="name_span">(No Name)</span>
+<div><textarea cols="80" rows="24" id="source" name="source"></textarea></div>
+<input id="save_button" type="submit" value="Speichern" />
+</form>
+
+<span id="error_message"></span>
+
+</body>
+</html>
