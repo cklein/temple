@@ -18,7 +18,7 @@ from uuid import uuid4
 def couch():
     """Helper function"""
     return setup_couchdb(settings.TEMPLATE_COUCHDB_SERVER,
-                         getattr(settings, 'TEMPLATE_COUCHDB_DATABASE', 'tempaltes'))
+                         getattr(settings, 'TEMPLATE_COUCHDB_DATABASE', 'templates'))
 
 
 def list_templates(request):

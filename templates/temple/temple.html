@@ -1,5 +1,57 @@
+{% load i18n %}
 <html>
 <head>
+    <title>temple - {% trans "the template editor" %}</title>
+    <style type="text/css">
+        #header {
+            background: #666666;
+            width: 80%;
+            height: 20%;
+            
+            margin: auto;
+            padding: 10px;
+            
+            text-align: center;
+            vertical-align: middle;
+            font-size: 24pt;
+            
+        }
+        body {
+        }
+        #content {
+            
+            background: #aaaaaa;
+            width: 80%;
+            
+            margin: auto;
+            padding: 10px;
+            
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        #footer {
+            background: #666666;
+            width: 80%;
+            height: 20%;
+            
+            padding: 10px;
+            margin: auto;
+        }
+        
+        #name_input {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        
+        #template_select {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        
+    </style>
     <script src="http://localhost:5984/_utils/script/jquery.js?1.3.1" type="text/javascript"></script>
     <script type="text/javascript">
         <!--
@@ -23,6 +75,7 @@
                     $.post("../get/", params, function(data) {
                         text = data.source;
                         $("#source").val(data);
+                        $("#name_span").text("filename");
                     });
                 });
                 
@@ -51,6 +104,7 @@
                         var params = {"id": $("#template_select").val(),
                                       "name": $("#name_input").val(),
                                       "source": $("#source").val()};
+                        
                         $.post("../set/", params, function(data) {
                             if(data.status != 'ok') {
                                 $("#error_message").text(data.msg);
@@ -66,9 +120,12 @@
     </script>
 </head>
 <body>
+<div id="header">T E M P L E</div>
+
+<div id="content">
 <form id="edit_form" action="." method="POST">
-<div>
-    <select name="template" id="template_select">
+<div id="inputs">
+<select name="template" id="template_select">
     <option value="-1">New Template...</option>
 {% for id, name in templates %}
     {% ifequal id page_id %}
@@ -77,14 +134,22 @@
          <option value="{{id}}">{{ name }}</option>
     {% endifequal %}
 {% endfor %}
-    </select>
-</div>
-<div>Name: <input id="name_input" value="{{ name }}"/><span id="name_span">(No Name)</span>
-<div><textarea cols="80" rows="24" id="source" name="source"></textarea></div>
-<input id="save_button" type="submit" value="Speichern" />
-</form>
+</select>
 
-<span id="error_message"></span>
+    <label for="name_input">Name:</label><input id="name_input" value="{{ name }}"/>
+    <span id="name_span">(No Name)</span>
+    <input id="save_button" type="submit" value="Speichern" />
+</div>
+
+<div>
+    <textarea cols="80" rows="24" id="source" name="source"></textarea>
+</div>
+</form>
+</div>
+
+<div id="footer">
+    <span id="error_message"></span>
+</div>
 
 </body>
 </html>
